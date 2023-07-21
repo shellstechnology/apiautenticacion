@@ -20,20 +20,20 @@ class UserTest extends TestCase
      */
     public function test_ObtenerTokenConClientIdValido()
     {
-        Artisan::call('passport:client',[
+        Artisan::call('passport:client', [
             '--password' => true,
-            '--no-interaction'=>true,
-            '--name'=>'Test Client',
-        ]);        
-            
-        $client = Client::findOrFail(2);
+            '--no-interaction' => true,
+            '--name' => 'Test Client',
+        ]);
 
-        $response = $this->post('/oauth/token',[
+        $cliente = Client::findOrFail(2);
+
+        $response = $this->post('/oauth/token', [
             "username" => "usuario@usuario",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
-            "client_secret" => $client -> secret
+            "client_secret" => $cliente->secret
         ]);
 
         $response->assertStatus(200);
@@ -47,16 +47,15 @@ class UserTest extends TestCase
         $response->assertJsonFragment([
             "token_type" => "Bearer"
         ]);
-
     }
 
     public function test_ObtenerTokenConClientIdInvalido()
     {
-         
-        $response = $this->post('/oauth/token',[
+
+        $response = $this->post('/oauth/token', [
             "grant_type" => "password",
             "client_id" => "234",
-            "client_secret" => "sdfsdfsdf"
+            "client_secret" => "shellsTech"
         ]);
 
         $response->assertStatus(401);
@@ -71,71 +70,68 @@ class UserTest extends TestCase
     {
         $response = $this->get('/api/v1/validate');
         $response->assertStatus(500);
-        
     }
 
     public function test_ValidarTokenConTokenInvalido()
     {
-        $response = $this->get('/api/v1/validate',[
-            [ "Authorization" => "Token Roto"]
+        $response = $this->get('/api/v1/validate', [
+            ["Authorization" => "Token Roto"]
         ]);
         $response->assertStatus(500);
-        
     }
 
     public function test_ValidarTokenConTokenValido()
     {
-        $client = Client::findOrFail(2);
-        $tokenResponse = $this -> post("/oauth/token",[
+        $cliente = Client::findOrFail(2);
+        $tokenResponse = $this->post("/oauth/token", [
             "username" => "usuario@usuario",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
-            "client_secret" => $client -> secret
+            "client_secret" => $cliente->secret
         ]);
 
-        $token = json_decode($tokenResponse -> content(),true);
-        
-        $response = $this->get('/api/v1/validate',
-            [ "Authorization" => "Bearer " . $token ['access_token']]
+        $token = json_decode($tokenResponse->content(), true);
+
+        $response = $this->get(
+            '/api/v1/validate',
+            ["Authorization" => "Bearer " . $token['access_token']]
         );
 
 
         $response->assertStatus(200);
-        
     }
 
     public function test_LogoutSinToken()
     {
         $response = $this->get('/api/v1/logout');
         $response->assertStatus(500);
-        
     }
 
     public function test_LogoutConTokenInvalido()
     {
-        $response = $this->get('/api/v1/logout',[
-            [ "Authorization" => "Token Roto"]
+        $response = $this->get('/api/v1/logout', [
+            ["Authorization" => "Token Roto"]
         ]);
         $response->assertStatus(500);
-        
     }
 
     public function test_LogoutConTokenValido()
     {
-        $client = Client::findOrFail(2);
-        $tokenResponse = $this -> post("/oauth/token",[
+        $cliente = Client::findOrFail(2);
+        $tokenResponse = $this->post("/oauth/token", [
             "username" => "usuario@usuario",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
-            "client_secret" => $client -> secret
+            "client_secret" => $cliente->secret
         ]);
 
-        $token = json_decode($tokenResponse -> content(),true);
-        
-        $response = $this->get('/api/v1/logout',
-            [ "Authorization" => "Bearer " . $token ['access_token']]
+        $token = json_decode($tokenResponse->content(), true);
+
+        $response = $this->get(
+            '/api/v1/logout',
+            ["Authorization" => "Bearer " . $token['access_token']]
         );
 
 
@@ -143,8 +139,5 @@ class UserTest extends TestCase
         $response->assertJsonFragment(
             ['message' => 'Token Revoked']
         );
-        
     }
-
-
 }
