@@ -28,9 +28,13 @@ class UserController extends Controller
     }
 
     public function Login(Request $request){
-        $credentials = $request->only('name', 'password');
-        if (Auth::attempt($credentials));
-        
+        if(Auth::attempt(['name' => $request->name, 'password' => $request->password])){ 
+            $user = Auth::user(); 
+            $success['token'] =  $user->createToken('authToken')-> accessToken; 
+            $success['name'] =  $user->name;
+   
+            return $success;
+        } 
     }
 
     private function crearUsuario($request)
