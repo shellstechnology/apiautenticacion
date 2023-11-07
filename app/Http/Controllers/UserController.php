@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 
 
@@ -28,12 +29,14 @@ class UserController extends Controller
     }
 
     public function Login(Request $request){
-        if(Auth::attempt(['name' => $request->name, 'password' => $request->password])){ 
+        if(Auth::attempt(['name' => $request->post('name'), 'password' => $request->post('password')])){ 
             $user = Auth::user(); 
             $success['token'] =  $user->createToken('authToken')-> accessToken; 
             $success['name'] =  $user->name;
    
-            return $success;
+            $response = response($success);
+
+            return $response->cookie('token', $success['token'], 500); // Set the token as a cookie
         } 
     }
 
