@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-
+use Illuminate\Support\Facades\Session;
 
 
 class UserController extends Controller
@@ -31,12 +32,12 @@ class UserController extends Controller
     public function Login(Request $request){
         if(Auth::attempt(['name' => $request->post('name'), 'password' => $request->post('password')])){ 
             $user = Auth::user(); 
-            $success['token'] =  $user->createToken('authToken')-> accessToken; 
-            $success['name'] =  $user->name;
+            $success['accessToken'] =  $user->createToken('accessToken')->accessToken; 
    
-            $response = response($success);
-
-            return $response->cookie('token', $success['token'], 500); // Set the token as a cookie
+            $response = new Response($success);
+            Session::put('acces_token', $success['accessToken']);
+            $response->cookie('accessToken', $success['accessToken'], 500, '/', 'localhost:8006/'); 
+            return $response;
         } 
     }
 
