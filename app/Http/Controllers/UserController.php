@@ -32,13 +32,15 @@ class UserController extends Controller
     public function Login(Request $request){
         if(Auth::attempt(['name' => $request->post('name'), 'password' => $request->post('password')])){ 
             $user = Auth::user(); 
-            $success['accessToken'] =  $user->createToken('accessToken')->accessToken; 
+            $success['token'] =  $user->createToken('authToken')-> accessToken; 
+            $success['name'] =  $user->name;
    
-            $response = new Response($success);
-            Session::put('acces_token', $success['accessToken']);
-            $response->cookie('accessToken', $success['accessToken'], 500, '/', 'localhost:8006/'); 
-            return $response;
+            $response = response($success);
+
+            return $success ; 
         } 
+
+        return Response([ "message" => "Not authorized",], 401);
     }
 
     private function crearUsuario($request)
