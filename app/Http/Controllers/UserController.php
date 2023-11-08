@@ -36,8 +36,10 @@ class UserController extends Controller
    
             $response = response($success);
 
-            return $response->cookie('token', $success['token'], 500); // Set the token as a cookie
+            return $success ; 
         } 
+
+        return Response([ "message" => "Not authorized",], 401);
     }
 
     private function crearUsuario($request)
