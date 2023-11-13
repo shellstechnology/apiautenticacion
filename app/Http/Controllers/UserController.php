@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 
-
 class UserController extends Controller
 {
     public function Registrar(Request $request)
@@ -28,16 +27,14 @@ class UserController extends Controller
 
         return $this->crearUsuario($request);
     }
-
     public function Login(Request $request){
         if(Auth::attempt(['name' => $request->post('name'), 'password' => $request->post('password')])){ 
             $user = Auth::user(); 
             $success['token'] =  $user->createToken('authToken')-> accessToken; 
             $success['name'] =  $user->name;
-   
+            $success['id']=$user->id;
             $response = response($success);
-
-            return $success ; 
+            return $response ; 
         } 
 
         return Response([ "message" => "Not authorized",], 401);
